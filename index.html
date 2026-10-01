@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f16" />
+  <title>都市裂境 Demo</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app" class="app-shell">
+    <section id="base-screen" class="screen active base-screen">
+      <div class="scene-bg base-bg"></div>
+      <header class="hud top-hud">
+        <button class="player-chip glass" data-action="noop">
+          <span class="player-name">夜澄</span>
+          <span class="stamina-row"><span>⚡</span><span id="stamina">118/120</span></span>
+        </button>
+        <div class="currency-cluster">
+          <div class="currency glass"><span>●</span><span id="coins">125,360</span></div>
+          <div class="currency glass"><span>◆</span><span id="gems">1,280</span></div>
+          <button class="icon-btn glass" data-action="settings" aria-label="設定">⚙</button>
+        </div>
+      </header>
+
+      <div class="base-actions" aria-label="基地功能">
+        <button class="base-action action-recruit" data-action="gacha" data-label="酒館" aria-label="酒館／招募" title="酒館"><span class="site-icon"><img src="assets/icon_tavern.png" alt="" /></span></button>
+        <button class="base-action action-association" data-action="guild" data-label="協會" aria-label="協會" title="協會"><span class="site-icon"><img src="assets/icon_guild.png" alt="" /></span></button>
+        <button class="base-action action-shop" data-action="shop" data-label="補給商店" aria-label="補給商店" title="補給商店"><span class="site-icon"><img src="assets/icon_shop.png" alt="" /></span></button>
+        <button class="base-action action-medical" data-action="medical" data-label="醫療" aria-label="醫療" title="醫療"><span class="site-icon"><img src="assets/icon_medical.png" alt="" /></span></button>
+        <button class="base-action action-mission" data-action="mission" data-label="任務中心" aria-label="任務中心" title="任務中心"><span class="site-icon"><img src="assets/icon_mission.png" alt="" /></span></button>
+        <button class="base-action action-exit" data-action="dungeon" data-label="出城" aria-label="出城" title="出城"><span class="site-icon"><img src="assets/icon_exit.png" alt="" /></span></button>
+      </div>
+
+      <div class="partner-wrap base-partner">
+        <button id="base-partner-card" class="partner-card base-partner-card" data-action="partner" aria-label="和冒險夥伴互動">
+          <img id="base-partner-image" src="assets/partner_idle_1.png" alt="冒險夥伴待機姿勢" />
+        </button>
+        <div id="partner-bubble" class="speech-bubble hidden" aria-live="polite">今天的巡查，交給我。</div>
+      </div>
+      <button class="bag-btn glass" data-action="bag" aria-label="背包"><img src="assets/icon_bag.png" alt="" /></button>
+    </section>
+
+    <section id="gacha-screen" class="screen panel-screen">
+      <div class="scene-bg recruit-bg"></div>
+      <button class="back-btn glass" data-action="base">←</button>
+      <div class="simple-panel gacha-panel">
+        <div class="gacha-heading">
+          <div class="eyebrow">RECRUIT</div>
+          <h1>招募</h1>
+        </div>
+        <section class="event-banner" aria-label="當前活動">
+          <div class="event-banner-copy">
+            <span>LIMITED RECRUIT</span>
+            <strong>裂境搜查令</strong>
+            <small>當前活動</small>
+          </div>
+          <div class="event-emblem" aria-hidden="true">✦</div>
+        </section>
+        <div class="gacha-actions gacha-actions-minimal">
+          <button class="summon-btn" data-action="pull1"><span>單抽</span><small>◆ 160</small></button>
+          <button class="summon-btn summon-btn-primary" data-action="pull10"><span>十連抽</span><small>◆ 1,600</small></button>
+        </div>
+        <p class="gacha-hint">抽到角色後才會顯示完整卡面</p>
+      </div>
+    </section>
+
+    <section id="dungeon-screen" class="screen dungeon-screen">
+      <div class="scene-bg dungeon-bg"></div>
+      <header class="hud top-hud compact">
+        <button class="back-btn glass" data-action="base">←</button>
+        <div class="currency-cluster"><div class="currency glass">⚡ <span id="dungeon-stamina">118/120</span></div></div>
+      </header>
+      <aside class="quest-mini glass">
+        <div>☠ <span id="dungeon-progress">0/10</span></div>
+        <div>🐺 <span id="quest-kills">0/3</span></div>
+        <div>◆ <span id="quest-crystals">0/1</span></div>
+      </aside>
+      <div class="node-edit-tools">
+        <button id="node-edit-toggle" class="node-edit-btn" type="button">調整節點</button>
+        <button id="node-edit-reset" class="node-edit-reset hidden" type="button">重設</button>
+      </div>
+      <div class="map-nodes" id="map-nodes">
+        <button class="node n1" data-node="1" aria-label="戰鬥節點 1"><span class="node-index">1</span><span class="node-symbol">⚔</span></button>
+        <button class="node n2" data-node="2" aria-label="戰鬥節點 2"><span class="node-index">2</span><span class="node-symbol">?</span></button>
+        <button class="node n3" data-node="3" aria-label="戰鬥節點 3"><span class="node-index">3</span><span class="node-symbol">⚔</span></button>
+        <button class="node n4" data-node="4" aria-label="戰鬥節點 4"><span class="node-index">4</span><span class="node-symbol">?</span></button>
+        <button class="node n5" data-node="5" aria-label="戰鬥節點 5"><span class="node-index">5</span><span class="node-symbol">⚔</span></button>
+        <button class="node n6" data-node="6" aria-label="戰鬥節點 6"><span class="node-index">6</span><span class="node-symbol">?</span></button>
+        <button class="node n7" data-node="7" aria-label="戰鬥節點 7"><span class="node-index">7</span><span class="node-symbol">⚔</span></button>
+        <button class="node n8" data-node="8" aria-label="戰鬥節點 8"><span class="node-index">8</span><span class="node-symbol">?</span></button>
+        <button class="node n9" data-node="9" aria-label="戰鬥節點 9"><span class="node-index">9</span><span class="node-symbol">⚔</span></button>
+        <button class="node boss-node n10" data-node="10" aria-label="Boss 節點 10"><span class="node-index">10</span><span class="node-symbol">BOSS</span></button>
+      </div>
+      <div class="partner-wrap mini-partner"><button class="partner-card" data-action="partner"><img src="assets/char1.png" alt="冒險夥伴" /></button></div>
+      <button class="bag-btn glass" data-action="bag">▣</button>
+    </section>
+
+    <section id="battle-screen" class="screen battle-screen">
+      <div class="scene-bg battle-bg"></div>
+      <header class="battle-top"><button class="back-btn glass" data-action="dungeon">←</button><span>TURN <b id="turn-count">1</b></span></header>
+      <div class="enemy-zone">
+        <div class="enemy-name">裂骸獸</div>
+        <div class="bar"><i id="enemy-hp-bar"></i></div>
+        <div class="enemy-hp"><span id="enemy-hp">2400</span>/2400</div>
+      </div>
+      <div class="party-row" id="party-row"></div>
+      <div class="battle-actions glass-strong">
+        <button data-battle="attack">攻擊</button>
+        <button data-battle="skill">技能</button>
+        <button data-battle="item">道具</button>
+        <button data-battle="guard">防禦</button>
+      </div>
+      <div id="skill-menu" class="skill-menu hidden glass-strong"></div>
+      <div id="battle-log" class="battle-log">選擇行動</div>
+      <div id="ultimate-overlay" class="ultimate-overlay hidden">
+        <img id="ultimate-image" src="assets/char2.png" alt="大招演出" />
+        <div class="ultimate-title">覺醒技</div>
+      </div>
+    </section>
+
+    <section id="bag-screen" class="screen panel-screen bag-screen">
+      <div class="scene-bg base-bg blur-more"></div>
+      <button class="back-btn glass" data-action="base">←</button>
+      <div class="simple-panel bag-panel glass-strong">
+        <div class="bag-tabs">
+          <button class="tab active" data-tab="items">道具</button>
+          <button class="tab" data-tab="cards">卡冊</button>
+          <button class="tab" data-tab="journal">日誌</button>
+          <button class="tab" data-tab="gear">裝備</button>
+        </div>
+        <div id="bag-content" class="bag-content"></div>
+      </div>
+    </section>
+
+    <div id="gacha-reveal" class="gacha-reveal hidden" data-gacha-next role="dialog" aria-modal="true" aria-label="招募結果">
+      <div class="gacha-reveal-glow"></div>
+      <div class="gacha-reveal-stage">
+        <div id="gacha-reveal-count" class="gacha-reveal-count"></div>
+        <img id="gacha-reveal-card" src="" alt="招募角色卡" />
+        <div id="gacha-reveal-name" class="gacha-reveal-name"></div>
+        <div class="gacha-reveal-next">點擊繼續</div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
