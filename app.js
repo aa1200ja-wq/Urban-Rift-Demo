@@ -96,42 +96,22 @@ const partnerLines=[
   '收到。這一帶我來盯著。',
   '走吧，跟緊我。'
 ];
-const PARTNER_IDLE_CHUNKS=[
-  '.asset_chunks/partner_idle_flow.1.b64',
-  '.asset_chunks/partner_idle_flow.2.b64',
-  '.asset_chunks/partner_idle_flow.3.b64',
-  '.asset_chunks/partner_idle_flow.4.b64'
-];
-let partnerVideoUrl='';
-async function initPartnerIdleVideo(){
+function initPartnerIdleVideo(){
   const video=$('#base-partner-video');
   const fallback=$('#base-partner-fallback');
   if(!video)return;
-  try{
-    const parts=await Promise.all(PARTNER_IDLE_CHUNKS.map(async url=>{
-      const response=await fetch(url);
-      if(!response.ok)throw new Error(`Partner animation load failed: ${url}`);
-      return response.text();
-    }));
-    const raw=atob(parts.join('').replace(/\s+/g,''));
-    const bytes=new Uint8Array(raw.length);
-    for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-    const blob=new Blob([bytes],{type:'video/webm'});
-    partnerVideoUrl=URL.createObjectURL(blob);
-    video.src=partnerVideoUrl;
-    const showVideo=()=>{
-      fallback?.classList.add('hidden');
-      video.classList.remove('hidden');
-      video.play().catch(()=>{});
-    };
-    if(video.readyState>=2)showVideo();
-    else video.addEventListener('loadeddata',showVideo,{once:true});
-    video.load();
-  }catch(error){
-    console.warn('Partner idle animation fallback:',error);
+  const showVideo=()=>{
+    fallback?.classList.add('hidden');
+    video.classList.remove('hidden');
+    video.play().catch(()=>{});
+  };
+  const showFallback=()=>{
     video.classList.add('hidden');
     fallback?.classList.remove('hidden');
-  }
+  };
+  if(video.readyState>=2)showVideo();
+  else video.addEventListener('loadeddata',showVideo,{once:true});
+  video.addEventListener('error',showFallback,{once:true});
 }
 let partnerBubbleTimer=0;
 let partnerReactTimer=0;
