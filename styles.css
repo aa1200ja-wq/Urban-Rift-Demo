@@ -165,3 +165,23 @@
 @media(prefers-reduced-motion:reduce){.gacha-reveal-glow,.gacha-reveal-stage img{animation:none}}
 
 .recruit-bg{background-image:url('assets/base.png');background-position:center 45%;filter:blur(8px) saturate(.55) brightness(.42);transform:scale(1.08)}
+
+
+/* v11: animated base partner */
+.base-partner .base-partner-card video,
+.base-partner .base-partner-card #base-partner-fallback{
+  width:100%;height:100%;object-fit:contain;object-position:left bottom;
+  filter:drop-shadow(0 18px 18px rgba(0,0,0,.46));
+  transform-origin:48% 100%;
+}
+.base-partner .base-partner-card video{
+  display:block;background:transparent;animation:none;will-change:auto;
+}
+.base-partner .base-partner-card #base-partner-fallback{
+  position:absolute;inset:0;
+  animation:partnerBreath 3.4s ease-in-out infinite;
+  will-change:transform,filter;
+}
+@media (prefers-reduced-motion:reduce){
+  .base-partner .base-partner-card #base-partner-fallback{animation:none}
+}
