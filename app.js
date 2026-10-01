@@ -91,22 +91,55 @@ function initNodeEditor(){
 function show(name){state.screen=name;screens.forEach(s=>s.classList.toggle('active',s.id===`${name}-screen`)); if(name==='battle') renderBattle(); if(name==='bag') renderBag('items'); if(name==='dungeon') renderDungeon(); sync();}
 function sync(){ $('#stamina').textContent=`${state.stamina}/120`; $('#dungeon-stamina').textContent=`${state.stamina}/120`; $('#coins').textContent=state.coins.toLocaleString(); $('#gems').textContent=state.gems.toLocaleString(); $('#quest-kills').textContent=`${state.quest.kills}/3`; $('#quest-crystals').textContent=`${state.quest.crystals}/1`; const progress=$('#dungeon-progress'); if(progress) progress.textContent=`${state.clearedNodes.size}/10`; }
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),1400)}
-const partnerPoses=[
-  {img:'assets/partner_idle_1.png',line:'今天的巡查，交給我。'},
-  {img:'assets/partner_idle_2.png',line:'收到。這一帶我來盯著。'},
-  {img:'assets/partner_idle_3.png',line:'走吧，跟緊我。'}
+const partnerLines=[
+  '今天的巡查，交給我。',
+  '收到。這一帶我來盯著。',
+  '走吧，跟緊我。'
 ];
-partnerPoses.forEach(p=>{const preload=new Image();preload.src=p.img});
+const PARTNER_IDLE_CHUNKS=[
+  '.asset_chunks/partner_idle_flow.1.b64',
+  '.asset_chunks/partner_idle_flow.2.b64',
+  '.asset_chunks/partner_idle_flow.3.b64',
+  '.asset_chunks/partner_idle_flow.4.b64'
+];
+let partnerVideoUrl='';
+async function initPartnerIdleVideo(){
+  const video=$('#base-partner-video');
+  const fallback=$('#base-partner-fallback');
+  if(!video)return;
+  try{
+    const parts=await Promise.all(PARTNER_IDLE_CHUNKS.map(async url=>{
+      const response=await fetch(url);
+      if(!response.ok)throw new Error(`Partner animation load failed: ${url}`);
+      return response.text();
+    }));
+    const raw=atob(parts.join('').replace(/\s+/g,''));
+    const bytes=new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+    const blob=new Blob([bytes],{type:'video/webm'});
+    partnerVideoUrl=URL.createObjectURL(blob);
+    video.src=partnerVideoUrl;
+    const showVideo=()=>{
+      fallback?.classList.add('hidden');
+      video.classList.remove('hidden');
+      video.play().catch(()=>{});
+    };
+    if(video.readyState>=2)showVideo();
+    else video.addEventListener('loadeddata',showVideo,{once:true});
+    video.load();
+  }catch(error){
+    console.warn('Partner idle animation fallback:',error);
+    video.classList.add('hidden');
+    fallback?.classList.remove('hidden');
+  }
+}
 let partnerBubbleTimer=0;
 let partnerReactTimer=0;
 function partnerTalk(button){
   if(!button?.classList.contains('base-partner-card')){toast('我在。');return}
-  state.partnerPose=(state.partnerPose+1)%partnerPoses.length;
-  const pose=partnerPoses[state.partnerPose];
-  const img=$('#base-partner-image');
+  state.partnerPose=(state.partnerPose+1)%partnerLines.length;
   const b=$('#partner-bubble');
-  img.src=pose.img;
-  b.textContent=pose.line;
+  b.textContent=partnerLines[state.partnerPose];
   b.classList.remove('hidden');
   button.classList.remove('reacting');
   void button.offsetWidth;
@@ -116,6 +149,7 @@ function partnerTalk(button){
   partnerReactTimer=setTimeout(()=>button.classList.remove('reacting'),480);
   partnerBubbleTimer=setTimeout(()=>b.classList.add('hidden'),2000);
 }
+
 let revealQueue=[];
 let revealIndex=0;
 function showGachaReveal(){
@@ -220,5 +254,6 @@ function runBaseAction(button){
   },650);
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-gacha-next]')){nextGachaReveal();return}const a=e.target.closest('[data-action]');if(a){const x=a.dataset.action;if(a.classList.contains('base-action')){runBaseAction(a)}else{if(['base','gacha','dungeon','bag'].includes(x))show(x);if(x==='partner')partnerTalk(a);if(x==='pull1')pull(1);if(x==='pull10')pull(10);if(x==='shop')toast('商店放第二階段');if(x==='guild')toast('協會放第二階段');if(x==='medical')toast('醫療放第二階段');if(x==='mission')toast('任務中心放第二階段');if(x==='settings')toast('設定');}}const node=e.target.closest('[data-node]');if(node&&!nodeEditMode)enterNode(+node.dataset.node);const b=e.target.closest('[data-battle]');if(b)battleAction(b.dataset.battle);const tab=e.target.closest('[data-tab]');if(tab)renderBag(tab.dataset.tab);const card=e.target.closest('[data-card-id]');if(card){const found=state.characterCards.find(x=>x.id===card.dataset.cardId);if(found)toast(`${found.rarity} · ${found.name} · ${found.job}`)}});
+initPartnerIdleVideo();
 initNodeEditor();
 if('serviceWorker' in navigator && (location.protocol==='http:' || location.protocol==='https:')) navigator.serviceWorker.register('sw.js').catch(()=>{});renderDungeon();sync();
